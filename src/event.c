@@ -57,6 +57,23 @@ key_down(SDL_Keycode key)
 }
 
 void
+mouse_wheel(SDL_MouseWheelEvent wheel)
+{
+	if (wheel.y > 0) 
+	{
+		g_app.years_width++;
+		if (g_app.years_width > 100)
+			g_app.years_width = 100;
+	} 
+	else if (wheel.y < 0)
+	{
+		g_app.years_width--;
+		if (g_app.years_width <= 0)
+			g_app.years_width = 1;
+	}
+}
+
+void
 Events(SDL_Event e)
 {
 	while (SDL_PollEvent(&e) != 0)
@@ -76,28 +93,15 @@ Events(SDL_Event e)
 					g_app.mouse = get_mouse_state();
 					break;
 				}
+			case SDL_MOUSEWHEEL:
+				{
+					mouse_wheel(e.wheel);
+					break;
+				}
 		}
 	}
 }
-
 #if 0
-
-void
-mouse_wheel(SDL_MouseWheelEvent wheel)
-{
-	float x, y;
-	SDL_GetMouseState(&x, &y);
-	/* printf("wheel.y = %f\n", wheel.y); */
-	if (wheel.y > 0) 
-	{
-		zoom_camera(g_inst.cam, 1.1f, x, y); // Zoom in
-	} 
-	else if (wheel.y < 0)
-	{
-		zoom_camera(g_inst.cam, 0.9f, x, y); // Zoom in
-	}
-}
-
 void
 drop_event(char *fname)
 {

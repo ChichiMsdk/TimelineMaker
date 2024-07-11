@@ -8,6 +8,9 @@
 
 #include "render.h"
 #include "events.h"
+#include "font.h"
+
+#define CLAMP(x, a, b) SDL_min(a, SDL_max(x, b))
 
 typedef struct Instance
 {
@@ -17,6 +20,10 @@ typedef struct Instance
 
 	bool			run;
 	Mouse_state		mouse;
+
+	int				years_width;
+	font			myfont;
+	TTF_Font		*ttf;
 }Instance;
 
 extern Instance		g_app;
