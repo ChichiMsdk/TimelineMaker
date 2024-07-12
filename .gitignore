@@ -1,0 +1,6 @@
+cmd.txt
+external/
+*.json
+build/
+.cache/
+.cache
