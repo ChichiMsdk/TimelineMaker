@@ -14,15 +14,24 @@
 
 typedef struct Instance
 {
+	int				test;
 	SDL_Renderer	*r;
 	SDL_Window		*w;
 	SDL_Event		e;
 
 	bool			run;
+	bool			grab;
+	bool			move;
 	Mouse_state		mouse;
+	Mouse_state		startPos;
+	Mouse_state		lastPos;
 
-	int				years_width;
-	font			myfont;
+	int				w_years;
+	int				s_years;
+	int				e_years;
+	int				index_font;
+	font			current;
+	font			myfont[6];
 	TTF_Font		*ttf;
 }Instance;
 

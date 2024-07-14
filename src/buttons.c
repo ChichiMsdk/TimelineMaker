@@ -1,11 +1,13 @@
 #include "buttons.h"
-#include <utils/logger.h>
+#include "app.h"
+
+extern Instance		g_app;
 
 Mouse_state
 get_mouse_state(void)
 {
 	int x, y;
-	Mouse_state mouse;
+	Mouse_state mouse = {0};
 	uint32_t flags = SDL_GetMouseState(&x, &y);
 	mouse.pos = vec2i(x, y);
 	mouse.flags = flags;
@@ -77,6 +79,20 @@ button_check_pressed(Mouse_state mouse, Button *button)
 		}
 		i++;
 	}
+}
+
+void
+timeline_mouse_pressed(Mouse_state mouse)
+{
+	g_app.startPos = get_mouse_state();
+	g_app.grab = true;
+}
+
+void
+timeline_mouse_released(Mouse_state mouse)
+{
+	g_app.lastPos = get_mouse_state();
+	g_app.grab = false;
 }
 
 void

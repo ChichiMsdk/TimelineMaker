@@ -64,7 +64,8 @@ init_systems(void)
 	g_app.run = true;
 	g_app.grab = false;
 	g_app.move = false;
-	g_app.w_years = 32;
+	g_app.w_years = 5;
+	g_app.test = 0;
 
 	TM_ASSERT(TTF_Init() == 0);
 	load_fonts();

@@ -44,24 +44,30 @@ key_down(SDL_Keycode key)
 		case SDLK_KP_MINUS:
 			break;
 		case SDLK_LEFT:
+			g_app.s_years--;
+			if (g_app.s_years < 0)
+				g_app.s_years = 0;
+			break;
+		case SDLK_RIGHT:
+			g_app.s_years++;
+			if (g_app.s_years > 999)
+				g_app.s_years = 999;
+			break;
+		case SDLK_y:
+			break;
+		case SDLK_DOWN:
 			g_app.index_font--;
 			if (g_app.index_font < 0)
 				g_app.index_font = 4;
 			g_app.current = g_app.myfont[g_app.index_font];
 			printf("g_app.index_font: %d\n", g_app.index_font);
 			break;
-		case SDLK_RIGHT:
+		case SDLK_UP:
 			g_app.index_font++;
 			if (g_app.index_font >= 5)
 				g_app.index_font = 0;
 			g_app.current = g_app.myfont[g_app.index_font];
 			printf("g_app.index_font: %d\n", g_app.index_font);
-			break;
-		case SDLK_y:
-			break;
-		case SDLK_DOWN:
-			break;
-		case SDLK_UP:
 			break;
 	}
 }

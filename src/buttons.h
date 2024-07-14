@@ -12,6 +12,8 @@ typedef struct Mouse_state
 {
 	Vec2i				pos;
 	uint32_t			flags;
+	bool				moved;
+
 }Mouse_state;
 
 typedef struct Button
@@ -32,5 +34,7 @@ enum
 };
 
 Mouse_state		get_mouse_state(void);
+void			timeline_mouse_pressed(Mouse_state mouse);
+void			timeline_mouse_released(Mouse_state mouse);
 
 #endif //BUTTONS_H
