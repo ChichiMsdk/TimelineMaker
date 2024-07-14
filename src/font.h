@@ -36,6 +36,8 @@ typedef struct font
 	/* State; see below */
 	SDL_Color	color;
 	font_data	data;
+	float		x;
+	float		y;
 } font;
 
 void				init_font(font *f, SDL_Renderer *r, TTF_Font *ttf);

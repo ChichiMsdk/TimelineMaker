@@ -11,15 +11,19 @@ render_font()
 }
 
 static const glyph*
-font_putchar(font *self, SDL_Renderer *renderer, SDL_Point dest, char text)
+font_putchar(font *self, SDL_Renderer *r, SDL_Point dest, char text)
 {
 	if(text == '\0') 
 		return NULL; 
 	/* Lookup the glyph from the character */
 	const glyph *g = &self->data.glyphs[(size_t)text];
 	SDL_Rect d = { .x = dest.x, .y = dest.y, .w = g->w, .h = self->data.height };
+	float sx, sy;
+	SDL_RenderGetScale(r, &sx, &sy);
+	SDL_RenderSetScale(r, self->x, self->y);
 	SDL_SetTextureColorMod(g->texture, self->color.r, self->color.g, self->color.b);
-	SDL_RenderCopy(renderer, g->texture, NULL, &d);
+	SDL_RenderCopy(r, g->texture, NULL, &d);
+	SDL_RenderSetScale(r, sx, sy);
 	return g;
 }
 
@@ -28,18 +32,15 @@ font_putchar(font *self, SDL_Renderer *renderer, SDL_Point dest, char text)
  * If text will remain static, just use TTF_RenderUTF8_Blended_Wrapped
  */
 void
-font_write(font *self, SDL_Renderer *renderer, SDL_Point point, const char *text) 
+font_write(font *self, SDL_Renderer *r, SDL_Point p, const char *text)
 {
 	const char *t = text;
-	/* QueryPerformanceCounter(&wstart); */
 	while(*t != '\0')
 	{
-		const glyph *g = font_putchar(self, renderer, point, *t);
-		point.x += g->w;
+		const glyph *g = font_putchar(self, r, p, *t);
+		p.x += g->w;
 		t++;
 	} 
-	/* QueryPerformanceCounter(&wend); */
-	/* print_timer(wstart, wend, wfreq); */
 }
 
 static void 
@@ -99,6 +100,8 @@ init_font(font *self, SDL_Renderer *renderer, TTF_Font *ttf)
 {
 	font_data *data = &(self->data);
 	self->color = (SDL_Color){255, 255, 255};
+	self->x = 1.0f;
+	self->y = 1.0f;
 
 	data->font = ttf;
 	data->height = TTF_FontHeight(ttf);

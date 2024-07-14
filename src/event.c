@@ -1,5 +1,5 @@
 #include "app.h"
-
+#include <stdio.h>
 void
 key_up(SDL_Keycode key)
 {
@@ -44,8 +44,18 @@ key_down(SDL_Keycode key)
 		case SDLK_KP_MINUS:
 			break;
 		case SDLK_LEFT:
+			g_app.index_font--;
+			if (g_app.index_font < 0)
+				g_app.index_font = 4;
+			g_app.current = g_app.myfont[g_app.index_font];
+			printf("g_app.index_font: %d\n", g_app.index_font);
 			break;
 		case SDLK_RIGHT:
+			g_app.index_font++;
+			if (g_app.index_font >= 5)
+				g_app.index_font = 0;
+			g_app.current = g_app.myfont[g_app.index_font];
+			printf("g_app.index_font: %d\n", g_app.index_font);
 			break;
 		case SDLK_y:
 			break;
@@ -61,15 +71,15 @@ mouse_wheel(SDL_MouseWheelEvent wheel)
 {
 	if (wheel.y > 0) 
 	{
-		g_app.years_width++;
-		if (g_app.years_width > 100)
-			g_app.years_width = 100;
+		g_app.w_years++;
+		if (g_app.w_years > 100)
+			g_app.w_years = 100;
 	} 
 	else if (wheel.y < 0)
 	{
-		g_app.years_width--;
-		if (g_app.years_width <= 0)
-			g_app.years_width = 1;
+		g_app.w_years--;
+		if (g_app.w_years <= 0)
+			g_app.w_years = 1;
 	}
 }
 
@@ -81,23 +91,33 @@ Events(SDL_Event e)
 		switch (e.type)
 		{
 			case SDL_QUIT:
-				{
-					g_app.run = false;
-				}
+				g_app.run = false;
+			case SDL_KEYUP:
+				key_up(e.key.keysym.sym);
+				break;
 			case SDL_KEYDOWN:
-				{
-					key_down(e.key.keysym.sym);
-				}
+				key_down(e.key.keysym.sym);
+				break;
 			case SDL_MOUSEMOTION:
+				if (g_app.grab)
 				{
+					/* TMINFO("move and grab"); */
+					g_app.lastPos = get_mouse_state();
 					g_app.mouse = get_mouse_state();
-					break;
 				}
+				g_app.lastPos = get_mouse_state();
+				g_app.mouse = get_mouse_state();
+				break;
+			case SDL_MOUSEBUTTONUP:
+				timeline_mouse_released(get_mouse_state());
+				break;
+			case SDL_MOUSEBUTTONDOWN:
+				TMINFO("grab");
+				timeline_mouse_pressed(get_mouse_state());
+				break;
 			case SDL_MOUSEWHEEL:
-				{
-					mouse_wheel(e.wheel);
-					break;
-				}
+				mouse_wheel(e.wheel);
+				break;
 		}
 	}
 }
