@@ -14,32 +14,12 @@ int			g_winh = 800;
 
 raw_font myraw[5];
 #include <stdio.h>
-void
-load_fonts(void)
-{
-	int i = 0;
-	myraw[0].data = __Montserrat_Regular_ttf; myraw[0].len = __Montserrat_Regular_ttf_len;
-	myraw[1].data = __Inter_Regular_ttf; myraw[1].len = __Inter_Regular_ttf_len;
-	myraw[2].data = __Nunito_Regular_ttf; myraw[2].len = __Nunito_Regular_ttf_len;
-	myraw[3].data = __Poppins_Regular_ttf; myraw[3].len = __Poppins_Regular_ttf_len;
-	myraw[4].data = Inconsolata_Regular_ttf; myraw[4].len = Inconsolata_Regular_ttf_len;
 
-	// HACK: maybe dont do that ?
-	while (i < sizeof(myraw) / sizeof(*myraw))
-	{
-		SDL_RWops *chunk = SDL_RWFromMem(myraw[i].data, myraw[i].len);
-		TM_ASSERT(chunk);
-		TTF_Font *ttf = TTF_OpenFontRW(chunk, SDL_TRUE, 32);
-		TM_ASSERT(ttf);
-		g_app.ttf = ttf;
-		init_font(&g_app.myfont[i], g_app.r, g_app.ttf);
-		TM_ASSERT(&g_app.myfont[i]);
-		TTF_CloseFont(g_app.ttf);
-		i++;
-	}
-	g_app.current = g_app.myfont[0]; 
-	g_app.index_font = 0;
-}
+static void
+load_fonts(void);
+
+static SDL_HitTestResult 
+my_hitTest(SDL_Window *win, const SDL_Point *area, void *data);
 
 void
 init_systems(void)
@@ -69,4 +49,45 @@ init_systems(void)
 
 	TM_ASSERT(TTF_Init() == 0);
 	load_fonts();
+	TM_ASSERT(SDL_SetWindowHitTest(g_app.w, my_hitTest, NULL) == 0);
+}
+
+// NOTE: Separate thread ?
+static SDL_HitTestResult 
+my_hitTest(SDL_Window *win, const SDL_Point *area, void *data)
+{
+	int lenkey;
+	const Uint8 *keyboard = SDL_GetKeyboardState(&lenkey);
+	if (keyboard[SDL_GetScancodeFromKey(SDLK_LSHIFT)])
+	{
+		return SDL_HITTEST_DRAGGABLE;
+	}
+	return SDL_HITTEST_NORMAL;
+}
+
+static void
+load_fonts(void)
+{
+	int i = 0;
+	myraw[0].data = __Montserrat_Regular_ttf; myraw[0].len = __Montserrat_Regular_ttf_len;
+	myraw[1].data = __Inter_Regular_ttf; myraw[1].len = __Inter_Regular_ttf_len;
+	myraw[2].data = __Nunito_Regular_ttf; myraw[2].len = __Nunito_Regular_ttf_len;
+	myraw[3].data = __Poppins_Regular_ttf; myraw[3].len = __Poppins_Regular_ttf_len;
+	myraw[4].data = Inconsolata_Regular_ttf; myraw[4].len = Inconsolata_Regular_ttf_len;
+
+	// HACK: maybe dont do that ?
+	while (i < sizeof(myraw) / sizeof(*myraw))
+	{
+		SDL_RWops *chunk = SDL_RWFromMem(myraw[i].data, myraw[i].len);
+		TM_ASSERT(chunk);
+		TTF_Font *ttf = TTF_OpenFontRW(chunk, SDL_TRUE, 32);
+		TM_ASSERT(ttf);
+		g_app.ttf = ttf;
+		init_font(&g_app.myfont[i], g_app.r, g_app.ttf);
+		TM_ASSERT(&g_app.myfont[i]);
+		TTF_CloseFont(g_app.ttf);
+		i++;
+	}
+	g_app.current = g_app.myfont[0]; 
+	g_app.index_font = 0;
 }

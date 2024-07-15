@@ -11,17 +11,6 @@ extern int	array[4000];
 int			array[4000];
 
 
-SDL_HitTestResult 
-my_hitTest(SDL_Window *win, const SDL_Point *area, void *data)
-{
-	int lenkey;
-	const Uint8 *keyboard = SDL_GetKeyboardState(&lenkey);
-	if (keyboard[SDL_GetScancodeFromKey(SDLK_LSHIFT)])
-	{
-		return SDL_HITTEST_DRAGGABLE;
-	}
-	return SDL_HITTEST_NORMAL;
-}
 
 int
 main(void)
@@ -30,7 +19,6 @@ main(void)
 	int j = -2000;
 	for (int i = 0; i < 4000; i++)
 		array[i++] = j++;
-	TM_ASSERT(SDL_SetWindowHitTest(g_app.w, my_hitTest, NULL) == 0);
 	while (g_app.run)
 	{
 		Events(g_app.e);
