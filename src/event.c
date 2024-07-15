@@ -29,6 +29,22 @@ key_up(SDL_Keycode key)
 }
 
 void
+move_win(void)
+{
+	int x = 0, y = 0;
+	int xw, yw;
+	Mouse_state m = get_mouse_state();
+	if (m.flags == SDL_BUTTON_LMASK)
+	{
+		SDL_GetMouseState(&x, &y);
+		SDL_GetWindowPosition(g_app.w, &xw, &yw);
+		TMINFO("Winx: %d\tWiny: %d", xw, yw);
+		TMWARN("Mx: %d\tMy: %d", x, y);
+		SDL_SetWindowPosition(g_app.w, xw + x, yw + y);
+	}
+}
+
+void
 key_down(SDL_Keycode key)
 {
 /* record_pressed(key); */
@@ -54,6 +70,8 @@ key_down(SDL_Keycode key)
 				g_app.s_years = 999;
 			break;
 		case SDLK_y:
+			break;
+		case SDLK_LSHIFT:
 			break;
 		case SDLK_DOWN:
 			g_app.index_font--;
@@ -118,7 +136,6 @@ Events(SDL_Event e)
 				timeline_mouse_released(get_mouse_state());
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				TMINFO("grab");
 				timeline_mouse_pressed(get_mouse_state());
 				break;
 			case SDL_MOUSEWHEEL:
