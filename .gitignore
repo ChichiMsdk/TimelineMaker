@@ -3,3 +3,4 @@ external/
 *.json
 .cache/
 .cache
+.ignore
