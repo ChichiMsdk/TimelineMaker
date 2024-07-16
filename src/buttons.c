@@ -1,5 +1,6 @@
 #include "buttons.h"
 #include "app.h"
+#include "camera.h"
 
 extern Instance		g_app;
 
@@ -85,7 +86,20 @@ void
 timeline_mouse_pressed(Mouse_state mouse)
 {
 	g_app.startPos = get_mouse_state();
-	g_app.grab = true;
+	g_app.mouse = get_mouse_state();
+	if (mouse.flags == SDL_BUTTON_MMASK)
+	{
+		fstartPanx = g_app.mouse.pos.x;
+		fstartPany = g_app.mouse.pos.y;
+		g_app.grab = true;
+	}
+	else if (mouse.flags == SDL_BUTTON_LMASK)
+	{
+		float mx, my;
+		screen_to_world(g_app.mouse.pos.x, g_app.mouse.pos.y, &mx, &my);
+		fstartmovex = mx;
+		fstartmovey = my;
+	}
 }
 
 void

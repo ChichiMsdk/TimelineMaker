@@ -1,5 +1,64 @@
 #include "app.h"
+#include "camera.h"
+
 #include <stdio.h>
+
+void
+key_down(SDL_Keycode key)
+{
+/* record_pressed(key); */
+	switch (key)
+	{
+		case SDLK_ESCAPE:
+			g_app.run = false;
+			break;
+		case SDLK_BACKSPACE:
+			break;
+		case SDLK_KP_PLUS:
+			break;
+		case SDLK_KP_MINUS:
+			break;
+		case SDLK_LEFT:
+			foffsetx++;
+			g_app.s_years--;
+			if (g_app.s_years < 0)
+				g_app.s_years = 0;
+			break;
+		case SDLK_RIGHT:
+			foffsetx--;
+			g_app.s_years++;
+			if (g_app.s_years > 999)
+				g_app.s_years = 999;
+			break;
+		case SDLK_a:
+			break;
+		case SDLK_k:
+			break;
+		case SDLK_i:
+			break;
+		case SDLK_s:
+			break;
+		case SDLK_LSHIFT:
+			break;
+		case SDLK_DOWN:
+			foffsety--;
+			g_app.index_font--;
+			if (g_app.index_font < 0)
+				g_app.index_font = 4;
+			g_app.current = g_app.myfont[g_app.index_font];
+			printf("g_app.index_font: %d\n", g_app.index_font);
+			break;
+		case SDLK_UP:
+			foffsety++;
+			g_app.index_font++;
+			if (g_app.index_font >= 5)
+				g_app.index_font = 0;
+			g_app.current = g_app.myfont[g_app.index_font];
+			printf("g_app.index_font: %d\n", g_app.index_font);
+			break;
+	}
+}
+
 void
 key_up(SDL_Keycode key)
 {
@@ -29,70 +88,9 @@ key_up(SDL_Keycode key)
 }
 
 void
-move_win(void)
-{
-	int x = 0, y = 0;
-	int xw, yw;
-	Mouse_state m = get_mouse_state();
-	if (m.flags == SDL_BUTTON_LMASK)
-	{
-		SDL_GetMouseState(&x, &y);
-		SDL_GetWindowPosition(g_app.w, &xw, &yw);
-		TMINFO("Winx: %d\tWiny: %d", xw, yw);
-		TMWARN("Mx: %d\tMy: %d", x, y);
-		SDL_SetWindowPosition(g_app.w, xw + x, yw + y);
-	}
-}
-
-void
-key_down(SDL_Keycode key)
-{
-/* record_pressed(key); */
-	switch (key)
-	{
-		case SDLK_ESCAPE:
-			g_app.run = false;
-			break;
-		case SDLK_BACKSPACE:
-			break;
-		case SDLK_KP_PLUS:
-			break;
-		case SDLK_KP_MINUS:
-			break;
-		case SDLK_LEFT:
-			g_app.s_years--;
-			if (g_app.s_years < 0)
-				g_app.s_years = 0;
-			break;
-		case SDLK_RIGHT:
-			g_app.s_years++;
-			if (g_app.s_years > 999)
-				g_app.s_years = 999;
-			break;
-		case SDLK_y:
-			break;
-		case SDLK_LSHIFT:
-			break;
-		case SDLK_DOWN:
-			g_app.index_font--;
-			if (g_app.index_font < 0)
-				g_app.index_font = 4;
-			g_app.current = g_app.myfont[g_app.index_font];
-			printf("g_app.index_font: %d\n", g_app.index_font);
-			break;
-		case SDLK_UP:
-			g_app.index_font++;
-			if (g_app.index_font >= 5)
-				g_app.index_font = 0;
-			g_app.current = g_app.myfont[g_app.index_font];
-			printf("g_app.index_font: %d\n", g_app.index_font);
-			break;
-	}
-}
-
-void
 mouse_wheel(SDL_MouseWheelEvent wheel)
 {
+	zoom_world(wheel);
 	if (wheel.y > 0) 
 	{
 		g_app.w_years++;
@@ -128,6 +126,11 @@ Events(SDL_Event e)
 					/* TMINFO("move and grab"); */
 					g_app.lastPos = get_mouse_state();
 					g_app.mouse = get_mouse_state();
+					float mx, my;
+					screen_to_world(g_app.mouse.pos.x, g_app.mouse.pos.y, &mx, &my);
+					fstartmovex = mx;
+					fstartmovey = my;
+					pan_world();
 				}
 				g_app.lastPos = get_mouse_state();
 				g_app.mouse = get_mouse_state();
@@ -142,6 +145,22 @@ Events(SDL_Event e)
 				mouse_wheel(e.wheel);
 				break;
 		}
+	}
+}
+
+void
+move_win(void)
+{
+	int x = 0, y = 0;
+	int xw, yw;
+	Mouse_state m = get_mouse_state();
+	if (m.flags == SDL_BUTTON_LMASK)
+	{
+		SDL_GetMouseState(&x, &y);
+		SDL_GetWindowPosition(g_app.w, &xw, &yw);
+		TMINFO("Winx: %d\tWiny: %d", xw, yw);
+		TMWARN("Mx: %d\tMy: %d", x, y);
+		SDL_SetWindowPosition(g_app.w, xw + x, yw + y);
 	}
 }
 #if 0

@@ -6,11 +6,6 @@ Instance	g_app = {0};
 int			g_winw = 1000;
 int			g_winh = 800;
 
-/**
- *- Init all the systems, add params to choose which one
- *- Sets all the variable for the g_app instance
- *- Sets the fonts
- */
 
 raw_font myraw[5];
 #include <stdio.h>
@@ -21,6 +16,11 @@ load_fonts(void);
 static SDL_HitTestResult 
 my_hitTest(SDL_Window *win, const SDL_Point *area, void *data);
 
+/**
+ *- Init all the systems, add params to choose which one
+ *- Sets all the variable for the g_app instance
+ *- Sets the fonts
+ */
 void
 init_systems(void)
 {
@@ -43,6 +43,7 @@ init_systems(void)
 	g_app.e = e;
 	g_app.run = true;
 	g_app.grab = false;
+	g_app.grab2 = false;
 	g_app.move = false;
 	g_app.w_years = 5;
 	g_app.test = 0;

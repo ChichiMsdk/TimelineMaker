@@ -6,12 +6,12 @@
 
 #include "init.h"
 #include "app.h"
+#include "camera.h"
 
 extern int	array[4000];
 int			array[4000];
 
-
-
+// note: add timer to all "animation" timings
 int
 main(void)
 {
@@ -22,8 +22,9 @@ main(void)
 	while (g_app.run)
 	{
 		Events(g_app.e);
+
 		render_frames(g_app.r);
-		// NOTE: add timer to all "animation" timings
+
 		SDL_Delay(16);
 	}
 	return 0;

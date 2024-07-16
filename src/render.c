@@ -2,6 +2,7 @@
 #include "app.h"
 #include "primitive.h"
 #include "smooth.h"
+#include "camera.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -71,6 +72,8 @@ render_circles(SDL_Renderer *r, SDL_Rect r_time)
 	int centerX;
 	SDL_Rect rect = {.x = centerX, .y = 0, .w = 2, .h = g_winh};
 	
+	// HACK: CHECK CHATGPT PIECE OF SHIT, NO SNAPPING
+	// ALSO THE "SMOOTHNESS" IS ONLY A PROBLEM WHEN GOING FROM 0 AND G_WINW
 	int i = 0 + g_app.test;
 	/* int i = 0; */
 	while (i < g_app.w_years * 2 )
@@ -78,9 +81,9 @@ render_circles(SDL_Renderer *r, SDL_Rect r_time)
 		centerX = g_winw / nb_circles;
 		/* rect.x = i * (centerX + offset); */
 		rect.x = ((i * centerX) - (offset - tmp % g_winw));
-		current[i] = rect.x;
-		/* current[i] = interpolate(previous[i], rect.x, 0.1f); */
-		/* rect.x = current[i]; */
+		/* current[i] = rect.x; */
+		current[i] = interpolate(previous[i], rect.x, 0.1f);
+		rect.x = current[i];
 		draw_rect(r, TM_LIGHTGRAY, rect, FILLED);
 		draw_fill_circle(r, rect.x, centerY, radius, TM_GRAY);
 		i++;
@@ -168,13 +171,105 @@ render_rectangle(SDL_Renderer *r)
 }
 
 void
+idiot(SDL_Renderer *r)
+{
+	static int x = 0, y = 800 / 2;
+	static int w = 10000000, h = 50;
+	static int rx = 0, ry = 0;
+	float rh = h, rw = w;
+	static float fx, fy;
+
+	Mouse_state m = get_mouse_state();
+	screen_to_world(m.pos.x, m.pos.y, &fx, &fy);
+
+	SDL_Rect fakerect = {
+		.x = x,
+		.y = y,
+		.w = w,
+		.h = h
+	};
+
+	if (m.flags == SDL_BUTTON_LMASK)
+	{
+		if (SDL_PointInRect(&(SDL_Point){.x = fx, .y = fy}, &fakerect))
+		{
+			TMINFO("pressed: %f\t%f", fx, fy);
+			TMWARN("mouse: %d\t%d", m.pos.x, m.pos.y);
+			g_app.grab2 = true;
+		}
+	}
+	else
+		g_app.grab2 = false;
+	
+	if (g_app.grab2)
+		pan_object(&x, &y);
+
+	world_to_screen(x, y, &rx, &ry);
+	if (rx && ry)
+		TMINFO("%d %d %d %d ", rx, ry, x, y)
+	rh *= fscalex;
+	rw *= fscalex;
+	SDL_Rect rect = {
+		.x = rx,
+		.y = ry,
+		.w = rw,
+		.h = rh
+	};
+
+	YU_SetRenderDrawColor(r, YU_BLACK);
+	SDL_RenderDrawRect(r, &rect);
+
+	// clipping
+	int visible = 10;
+	float wl, wr, wt, wb;
+
+	screen_to_world(0, 0, &wl, &wt);
+	screen_to_world(g_winw, g_winh, &wr, &wb);
+
+	for (int y = 0; y <= visible; y++)
+	{
+		if (y >= wt && y <= wb)
+		{
+			float sx = 0, sy = y;
+			float ex = visible, ey = y;
+			int _sx, _sy, _ex, _ey;
+		
+			world_to_screen(sx, sy, &_sx, &_sy);
+			world_to_screen(ex, ey, &_ex, &_ey);
+		
+			SDL_RenderDrawLine(r, _sx, _sy, _ex, _ey);
+		}
+	}
+	for (int x = 0; x <= visible; x++)
+	{
+		if (x >= wl && x <= wr)
+		{
+			float sx = x, sy = 0;
+			float ex = x, ey = visible;
+			int _sx, _sy, _ex, _ey;
+
+			world_to_screen(sx, sy, &_sx, &_sy);
+			world_to_screen(ex, ey, &_ex, &_ey);
+
+			SDL_RenderDrawLine(r, _sx, _sy, _ex, _ey);
+		}
+	}
+}
+
+void
 render_frames(SDL_Renderer *r)
 {
+#if 1
+	clear_screen(r, TM_WHITE);
+	idiot(r);
+	SDL_RenderPresent(r);
+	return ;
+#endif
 	SDL_Rect r_mouse = { .x = g_app.mouse.pos.x, .y = 0, .w = 2, .h = g_winh };
 	clear_screen(r, TM_WHITE);
 	draw_rect(r, TM_LIGHTGRAY, r_mouse, FILLED);
 	render_timeline(r);
-	/* render_rectangle(r); */
+	render_rectangle(r);
 	font_write(&g_app.current, r, (SDL_Point){.x = g_winw - 400, .y = 100}, "Salut", YU_RED);
 	render_mouse_fake_cursor(r, YU_ORANGE);
 	SDL_RenderPresent(r);

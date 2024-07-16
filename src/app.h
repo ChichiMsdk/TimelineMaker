@@ -21,6 +21,7 @@ typedef struct Instance
 
 	bool			run;
 	bool			grab;
+	bool			grab2;
 	bool			move;
 	Mouse_state		mouse;
 	Mouse_state		startPos;
